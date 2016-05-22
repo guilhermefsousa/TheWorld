@@ -2,8 +2,14 @@
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using TheWorld.Models;
+using TheWorld.Models.Contexto;
+using TheWorld.Models.Repositorio;
+using TheWorld.Models.Repositorio.Interfaces;
 using TheWorld.Services;
+using TheWorld.Services.Interfaces;
 
 namespace TheWorld
 {
@@ -21,29 +27,52 @@ namespace TheWorld
             Configuracao = builder.Build();
 
         }
-        // This method gets called by the runtime. Use this method to add services to the container.
+        //Este método é chamado pelo tempo de execução.Utilize este método para adicionar serviços para o recipiente .
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
 
+            services.AddLogging();
+
+            services.AddEntityFramework()
+                .AddSqlServer() 
+                .AddDbContext<MundoContext>();
+
+            //uma vez que passado por ele, poderá ser destruido
+            services.AddTransient<MundoContextSeedData>();
+
+            services.AddScoped<IViagemRepositorio, ViagemRepositorio>();
+
+            services.AddScoped<IParadaRepositorio, ParadaRepositorio>();
+
+#if DEBUG
             services.AddScoped<IEmailService, DebugEmailService>();
+#else
+            services.AddScoped<IEmailService, EmailService>();
+#endif
+
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        //Este método é chamado pelo tempo de execução.Utilize este método para configurar o pipeline de solicitação HTTP.
+        public void Configure(IApplicationBuilder app, MundoContextSeedData seeder, ILoggerFactory loggerFactory)
         {
+            loggerFactory.AddDebug(LogLevel.Warning);
+
             app.UseStaticFiles();
+
             app.UseMvc(config =>
             {
                 config.MapRoute(
                     name: "Default",
                     template: "{controller}/{action}/{id?}",
-                    defaults: new {controller = "App", action = "Index"}
+                    defaults: new { controller = "App", action = "Index" }
                     );
             });
+
+            seeder.EnsureSeedData();
         }
 
-        // Entry point for the application.
+        //Ponto de entrada para a aplicação.
         public static void Main(string[] args) => WebApplication.Run<Startup>(args);
     }
 }

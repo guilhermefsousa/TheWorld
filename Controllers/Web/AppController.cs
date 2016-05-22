@@ -1,5 +1,6 @@
 using Microsoft.AspNet.Mvc;
-using TheWorld.Services;
+using TheWorld.Models.Repositorio.Interfaces;
+using TheWorld.Services.Interfaces;
 using TheWorld.ViewModels;
 
 namespace TheWorld.Controllers.Web
@@ -7,15 +8,19 @@ namespace TheWorld.Controllers.Web
     public class AppController : Controller
     {
         private readonly IEmailService _emailService;
+        private readonly IViagemRepositorio _mundoRepositorio;
 
-        public AppController(IEmailService emailService)
-         {
+        public AppController(IEmailService emailService, IViagemRepositorio mundoRepositorio)
+        {
             _emailService = emailService;
+            _mundoRepositorio = mundoRepositorio;
         }
 
         public IActionResult Index()
         {
-            return View();
+            var viagens = _mundoRepositorio.GetTodasViagens();
+
+            return View(viagens);
         }
 
         public IActionResult Sobre()
@@ -35,8 +40,8 @@ namespace TheWorld.Controllers.Web
                 return View();
 
             var email = Startup.Configuracao["AppConfiguracoes:EnderecoEmail"];
-            if(string.IsNullOrWhiteSpace(email))
-                ModelState.AddModelError("","Não foi possivel enviar o email, problema de configuração");
+            if (string.IsNullOrWhiteSpace(email))
+                ModelState.AddModelError("", "Não foi possivel enviar o email, problema de configuração");
 
             if (!_emailService.SendMail(email, "", $"Contato da Pagina {model.Nome} ({model.Email})", model.Mensagem))
                 return View();

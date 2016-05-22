@@ -1,5 +1,8 @@
 {
   "AppConfiguracoes": {
-    "EnderecoEmail" : "teste@aol.com" 
-  } 
+    "EnderecoEmail": "teste@aol.com"
+  },
+  "DataBase": {
+    "MundoContextConnection": "Server=(localdb)\\ProjectsV13;DataBase=TheWorldDB;Trusted_Connection=true;MultipleActiveResultSets=true"
+  }
 }

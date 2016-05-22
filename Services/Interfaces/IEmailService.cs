@@ -1,4 +1,4 @@
-﻿namespace TheWorld.Services
+﻿namespace TheWorld.Services.Interfaces
 {
     public interface IEmailService
     {
