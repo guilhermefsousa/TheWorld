@@ -1,0 +1,5 @@
+TheWorld.xproj
+TheWorld.xproj.user
+project.lock.json
+wwwroot/lib/
+.vs/
