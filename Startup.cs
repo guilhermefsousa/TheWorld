@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using Newtonsoft.Json.Serialization;
 using TheWorld.Models;
 using TheWorld.Models.Contexto;
 using TheWorld.Models.Repositorio;
@@ -30,7 +31,12 @@ namespace TheWorld
         //Este método é chamado pelo tempo de execução.Utilize este método para adicionar serviços para o recipiente .
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(opt =>
+                {
+                    //quando retorna Json, já retorna CamelCase (letra inicial minuscula)
+                    opt.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                });
 
             services.AddLogging();
 
